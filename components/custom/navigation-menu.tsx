@@ -52,7 +52,7 @@ function NavigationMenu() {
           <div className="flex items-center shrink-0">
             <img
               className="w-[250px] h-[60px] cursor-pointer"
-              src="/need foundation trust.jpg"
+              src="/NEED-FOUNDATION-TRUST.jpg"
               alt="need foundation logo"
               onClick={() => handleLinkClick({ label: "Home", href: "/" })}
             />
