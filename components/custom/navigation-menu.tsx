@@ -5,31 +5,39 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import CustomButton from "./custom-button";
 import { useRouter, usePathname } from "next/navigation";
 
-const links = [
+/* ================= TYPES ================= */
+
+type NavLink = {
+  label: string;
+  href: string;
+  dropdown?: NavLink[];
+};
+
+/* ================= LINKS ================= */
+
+const links: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about" },
   { label: "Latest News", href: "/latestnews" },
-
-  
-    { label: "Works", href: "/works" },
-    
-  ,
-
+  { label: "Works", href: "/works" },
   { label: "Certificates", href: "/certificates" },
   { label: "Gallery", href: "/gallery" },
 ];
 
+/* ================= COMPONENT ================= */
+
 function NavigationMenu() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
-  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [desktopDropdownOpen, setDesktopDropdownOpen] = useState<string | null>(null);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState<string | null>(null);
 
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLinkClick = (link) => {
+  const handleLinkClick = (link: NavLink) => {
     setMobileMenuOpen(false);
-    setDesktopDropdownOpen(false);
+    setDesktopDropdownOpen(null);
+    setMobileDropdownOpen(null);
     router.push(link.href);
   };
 
@@ -44,13 +52,13 @@ function NavigationMenu() {
           <div className="flex items-center shrink-0">
             <img
               className="w-[250px] h-[60px] cursor-pointer"
-              src="need foundation trust.jpg"
+              src="/need foundation trust.jpg"
               alt="need foundation logo"
               onClick={() => handleLinkClick({ label: "Home", href: "/" })}
             />
           </div>
 
-          {/* ------------ DESKTOP NAVIGATION ------------ */}
+          {/* ================= DESKTOP NAVIGATION ================= */}
           <ul className="hidden lg:flex items-center space-x-1">
             {links.map((link) => (
               <li key={link.label} className="relative group">
@@ -60,10 +68,10 @@ function NavigationMenu() {
                     <span
                       onClick={() =>
                         setDesktopDropdownOpen(
-                          desktopDropdownOpen === link.label ? false : link.label
+                          desktopDropdownOpen === link.label ? null : link.label
                         )
                       }
-                      className={`flex items-center gap-1 relative px-4 py-2 text-[16px] font-medium rounded-lg transition-all duration-300 cursor-pointer
+                      className={`flex items-center gap-1 px-4 py-2 text-[16px] font-medium rounded-lg transition-all duration-300 cursor-pointer
                         ${
                           pathname.startsWith(link.href)
                             ? "text-pink-600"
@@ -75,7 +83,7 @@ function NavigationMenu() {
                     </span>
 
                     {desktopDropdownOpen === link.label && (
-                      <div className="absolute top-12 left-0 w-56 bg-white shadow-lg border border-gray-200 rounded-lg py-2 z-50 animate-fadeIn">
+                      <div className="absolute top-12 left-0 w-56 bg-white shadow-lg border border-gray-200 rounded-lg py-2 z-50">
                         {link.dropdown.map((item) => (
                           <div
                             key={item.label}
@@ -91,7 +99,7 @@ function NavigationMenu() {
                 ) : (
                   <span
                     onClick={() => handleLinkClick(link)}
-                    className={`relative px-4 py-2 text-[16px] font-medium rounded-lg transition-all duration-300 group cursor-pointer
+                    className={`relative px-4 py-2 text-[16px] font-medium rounded-lg transition-all duration-300 cursor-pointer group
                       ${
                         pathname === link.href
                           ? "text-pink-600"
@@ -115,7 +123,9 @@ function NavigationMenu() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:block">
-            <CustomButton onClick={handleDonate}>Donate Now</CustomButton>
+            <CustomButton onClick={handleDonate}>
+              Donate Now
+            </CustomButton>
           </div>
 
           {/* Mobile Menu Button */}
@@ -123,29 +133,31 @@ function NavigationMenu() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
           >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {mobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </button>
         </div>
       </div>
 
-      {/* ------------ MOBILE NAVIGATION ------------ */}
+      {/* ================= MOBILE NAVIGATION ================= */}
       <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 z-50 relative
-        ${mobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}
-      `}
+        className={`lg:hidden overflow-hidden transition-all duration-300 relative z-50
+        ${mobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"}`}
       >
         <div className="px-4 pt-2 pb-4 space-y-1 bg-gray-50 border-t border-gray-200">
-
           {links.map((link) => (
             <div key={link.label}>
-              
+
               {link.dropdown ? (
                 <>
                   <div
                     className="flex justify-between items-center px-4 py-3 text-base font-medium cursor-pointer bg-white rounded-lg"
                     onClick={() =>
                       setMobileDropdownOpen(
-                        mobileDropdownOpen === link.label ? false : link.label
+                        mobileDropdownOpen === link.label ? null : link.label
                       )
                     }
                   >
@@ -157,37 +169,32 @@ function NavigationMenu() {
                     />
                   </div>
 
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ml-4
-                    ${
-                      mobileDropdownOpen === link.label
-                        ? "max-h-96"
-                        : "max-h-0"
-                    }`}
-                  >
-                    {link.dropdown.map((item) => (
-                      <div
-                        key={item.label}
-                        onClick={() => handleLinkClick(item)}
-                        className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md mb-1 cursor-pointer"
-                      >
-                        {item.label}
-                      </div>
-                    ))}
-                  </div>
+                  {mobileDropdownOpen === link.label && (
+                    <div className="ml-4 mt-2 space-y-1">
+                      {link.dropdown.map((item) => (
+                        <div
+                          key={item.label}
+                          onClick={() => handleLinkClick(item)}
+                          className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md cursor-pointer"
+                        >
+                          {item.label}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </>
               ) : (
-                <a
+                <div
                   onClick={() => handleLinkClick(link)}
                   className={`block px-4 py-3 rounded-lg text-base font-medium cursor-pointer
                     ${
                       pathname === link.href
-                        ? "bg-linear-to-r from-pink-600 to-red-600 text-white shadow-md"
+                        ? "bg-gradient-to-r from-pink-600 to-red-600 text-white shadow-md"
                         : "text-gray-700 bg-white"
                     }`}
                 >
                   {link.label}
-                </a>
+                </div>
               )}
             </div>
           ))}
@@ -204,7 +211,7 @@ function NavigationMenu() {
         </div>
       </div>
 
-      {/* Backdrop (fixed) */}
+      {/* Backdrop */}
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 lg:hidden"
